@@ -53,6 +53,10 @@ class MainActivity : AppCompatActivity(), AudioFragmentListener {
         Log.d("MainActivity", "Hello World Hi 22")
     }
 
+    override fun nonSnapDetected() {
+        cameraFragment.stopPersonDetection()
+    }
+
     private fun checkPermissions() {
         if (permissions.all{ActivityCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED}){
             Log.d(TAG, "All Permission Granted")
