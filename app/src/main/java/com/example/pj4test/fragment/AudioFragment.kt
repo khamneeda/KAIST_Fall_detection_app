@@ -68,7 +68,7 @@ class AudioFragment: Fragment(), SnapClassifier.DetectorListener {
     override fun onResults(score: Float) {
         activity?.runOnUiThread {
             if (score > SnapClassifier.THRESHOLD) {
-                snapView.text = "SNAP"
+                snapView.text = "FALL SOUND"
                 snapView.setBackgroundColor(ProjectConfiguration.activeBackgroundColor)
                 snapView.setTextColor(ProjectConfiguration.activeTextColor)
                 this.listener?.onSnapDetected()
@@ -77,9 +77,10 @@ class AudioFragment: Fragment(), SnapClassifier.DetectorListener {
                 Log.d("MainActivity", "here:"+i)
                 Log.d("MainActivity", "Hello World Hi")
             } else {
-                snapView.text = "NO SNAP"
+                snapView.text = "NO FALL SOUND"
                 snapView.setBackgroundColor(ProjectConfiguration.idleBackgroundColor)
                 snapView.setTextColor(ProjectConfiguration.idleTextColor)
+                this.listener?.nonSnapDetected()
             }
         }
     }

@@ -43,6 +43,7 @@ import java.util.concurrent.Executors
 import com.example.pj4test.cameraInference.PersonClassifier
 import com.example.pj4test.databinding.FragmentCameraBinding
 import org.tensorflow.lite.task.vision.detector.Detection
+import java.time.LocalDateTime
 
 class CameraFragment : Fragment(), PersonClassifier.DetectorListener {
     private val TAG = "CameraFragment"
@@ -162,14 +163,14 @@ class CameraFragment : Fragment(), PersonClassifier.DetectorListener {
         cameraProvider.unbindAll()
 
         try {
-            // A variable number of use-cases can be passed here -
-            // camera provides access to CameraControl & CameraInfo
-            camera = cameraProvider.bindToLifecycle(
-                this,
-                cameraSelector,
-                preview,
-                imageAnalyzer
-            )
+                // A variable number of use-cases can be passed here -
+                // camera provides access to CameraControl & CameraInfo
+                camera = cameraProvider.bindToLifecycle(
+                    this,
+                    cameraSelector,
+                    preview,
+                    imageAnalyzer
+                )
         } catch (exc: Exception) {
             Log.e(TAG, "Use case binding failed", exc)
         }
@@ -195,7 +196,9 @@ class CameraFragment : Fragment(), PersonClassifier.DetectorListener {
         val imageRotation = image.imageInfo.rotationDegrees
 
         // Pass Bitmap and rotation to the object detector helper for processing and detection
-        personClassifier.detect(bitmapBuffer, imageRotation)
+        if (isPersonDetectionEnabled) {
+            personClassifier.detect(bitmapBuffer, imageRotation)
+        }
     }
 
     // Update UI after objects have been detected. Extracts original image height/width
@@ -225,18 +228,19 @@ class CameraFragment : Fragment(), PersonClassifier.DetectorListener {
             // change UI according to the result
             if (isPersonDetected) {
                 if (isPersonDetectionEnabled) {
-                    personView.text = "PERSON"
+                    personView.text = "FALL HAS DETECTED"
                     personView.setBackgroundColor(ProjectConfiguration.activeBackgroundColor)
                     personView.setTextColor(ProjectConfiguration.activeTextColor)
+                    Thread.sleep(99999999)
                 }
                 else{
-                    personView.text = "NO PERSON"
+                    personView.text = "NOT FALL"
                     personView.setBackgroundColor(ProjectConfiguration.idleBackgroundColor)
                     personView.setTextColor(ProjectConfiguration.idleTextColor)
                 }
 
             } else {
-                personView.text = "NO PERSON"
+                personView.text = "NO FALL"
                 personView.setBackgroundColor(ProjectConfiguration.idleBackgroundColor)
                 personView.setTextColor(ProjectConfiguration.idleTextColor)
             }
