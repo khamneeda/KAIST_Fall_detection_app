@@ -61,6 +61,7 @@ class CameraFragment : Fragment(), PersonClassifier.DetectorListener {
     private var preview: Preview? = null
     private var imageAnalyzer: ImageAnalysis? = null
     private var camera: Camera? = null
+    var london_bridge_has_fallen = false
 
     /** Blocking camera operations are performed using this executor */
     private lateinit var cameraExecutor: ExecutorService
@@ -225,31 +226,41 @@ class CameraFragment : Fragment(), PersonClassifier.DetectorListener {
             if(isPersonDetectionEnabled==true) {i =1}
             Log.d("MainActivity", "here22:"+i)
 
-            // change UI according to the result
-            if (isPersonDetected) {
-                if (isPersonDetectionEnabled) {
-                    personView.text = "FALL HAS DETECTED"
-                    personView.setBackgroundColor(ProjectConfiguration.activeBackgroundColor)
-                    personView.setTextColor(ProjectConfiguration.activeTextColor)
-                    Thread.sleep(99999999)
-                }
-                else{
-                    personView.text = "NOT FALL"
+            if (london_bridge_has_fallen) {
+                personView.text = "FALL HAS DETECTED"
+                personView.setBackgroundColor(ProjectConfiguration.activeBackgroundColor)
+                personView.setTextColor(ProjectConfiguration.activeTextColor)
+                setImage()
+            } else {
+
+                // change UI according to the result
+                if (isPersonDetected) {
+                    if (isPersonDetectionEnabled) {
+                        personView.text = "FALL HAS DETECTED"
+                        personView.setBackgroundColor(ProjectConfiguration.activeBackgroundColor)
+                        personView.setTextColor(ProjectConfiguration.activeTextColor)
+                        london_bridge_has_fallen = true
+                    } else {
+                        personView.text = "NOT FALL"
+                        personView.setBackgroundColor(ProjectConfiguration.idleBackgroundColor)
+                        personView.setTextColor(ProjectConfiguration.idleTextColor)
+                    }
+
+                } else {
+                    personView.text = "NO FALL"
                     personView.setBackgroundColor(ProjectConfiguration.idleBackgroundColor)
                     personView.setTextColor(ProjectConfiguration.idleTextColor)
                 }
 
-            } else {
-                personView.text = "NO FALL"
-                personView.setBackgroundColor(ProjectConfiguration.idleBackgroundColor)
-                personView.setTextColor(ProjectConfiguration.idleTextColor)
+                // Force a redraw
+                fragmentCameraBinding.overlay.invalidate()
             }
-
-            // Force a redraw
-            fragmentCameraBinding.overlay.invalidate()
         }
     }
 
+    fun setImage(){
+        Thread.sleep(100000)
+    }
 
     override fun onObjectDetectionError(error: String) {
         activity?.runOnUiThread {
