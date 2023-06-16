@@ -1,6 +1,8 @@
 package com.example.pj4test.fragment
 
+import com.example.pj4test.AudioFragmentListener
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,6 +26,14 @@ class AudioFragment: Fragment(), SnapClassifier.DetectorListener {
     // views
     lateinit var snapView: TextView
 
+    private var listener: AudioFragmentListener? = null
+
+    fun setAudioFragmentListener(listener: AudioFragmentListener) {
+        this.listener = listener
+        if(listener==null){Log.d("MainActivity", "Hel111")}
+        else{Log.d("MainActivity", "Hel222")}
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -42,6 +52,7 @@ class AudioFragment: Fragment(), SnapClassifier.DetectorListener {
         snapClassifier = SnapClassifier()
         snapClassifier.initialize(requireContext())
         snapClassifier.setDetectorListener(this)
+        Log.d("MainActivity", "AudioFragment instance ID: ${System.identityHashCode(this)}")
     }
 
     override fun onPause() {
@@ -60,6 +71,11 @@ class AudioFragment: Fragment(), SnapClassifier.DetectorListener {
                 snapView.text = "SNAP"
                 snapView.setBackgroundColor(ProjectConfiguration.activeBackgroundColor)
                 snapView.setTextColor(ProjectConfiguration.activeTextColor)
+                this.listener?.onSnapDetected()
+                var i = 0
+                if(listener==null) {i =1}
+                Log.d("MainActivity", "here:"+i)
+                Log.d("MainActivity", "Hello World Hi")
             } else {
                 snapView.text = "NO SNAP"
                 snapView.setBackgroundColor(ProjectConfiguration.idleBackgroundColor)

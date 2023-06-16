@@ -33,6 +33,7 @@ import androidx.camera.core.ImageAnalysis.OUTPUT_IMAGE_FORMAT_RGBA_8888
 import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.example.pj4test.ProjectConfiguration
@@ -46,13 +47,14 @@ import org.tensorflow.lite.task.vision.detector.Detection
 class CameraFragment : Fragment(), PersonClassifier.DetectorListener {
     private val TAG = "CameraFragment"
 
+
     private var _fragmentCameraBinding: FragmentCameraBinding? = null
 
     private val fragmentCameraBinding
         get() = _fragmentCameraBinding!!
-    
+
     private lateinit var personView: TextView
-    
+
     private lateinit var personClassifier: PersonClassifier
     private lateinit var bitmapBuffer: Bitmap
     private var preview: Preview? = null
@@ -61,6 +63,18 @@ class CameraFragment : Fragment(), PersonClassifier.DetectorListener {
 
     /** Blocking camera operations are performed using this executor */
     private lateinit var cameraExecutor: ExecutorService
+
+    var isPersonDetectionEnabled = false
+
+    fun startPersonDetection() {
+        isPersonDetectionEnabled = true
+        Log.d("MainActivity", "Person detection enabled")
+    }
+
+    fun stopPersonDetection() {
+        isPersonDetectionEnabled = false
+        Log.d("MainActivity", "Person detection disabled")
+    }
 
     override fun onDestroyView() {
         _fragmentCameraBinding = null
@@ -199,15 +213,28 @@ class CameraFragment : Fragment(), PersonClassifier.DetectorListener {
                 imageHeight,
                 imageWidth
             )
-            
+
             // find at least one bounding box of the person
-            val isPersonDetected: Boolean = results!!.find { it.categories[0].label == "person" } != null
-            
+            val isPersonDetected: Boolean =
+                results!!.find { it.categories[0].label == "person" } != null
+
+            var i = 0
+            if(isPersonDetectionEnabled==true) {i =1}
+            Log.d("MainActivity", "here22:"+i)
+
             // change UI according to the result
             if (isPersonDetected) {
-                personView.text = "PERSON"
-                personView.setBackgroundColor(ProjectConfiguration.activeBackgroundColor)
-                personView.setTextColor(ProjectConfiguration.activeTextColor)
+                if (isPersonDetectionEnabled) {
+                    personView.text = "PERSON"
+                    personView.setBackgroundColor(ProjectConfiguration.activeBackgroundColor)
+                    personView.setTextColor(ProjectConfiguration.activeTextColor)
+                }
+                else{
+                    personView.text = "NO PERSON"
+                    personView.setBackgroundColor(ProjectConfiguration.idleBackgroundColor)
+                    personView.setTextColor(ProjectConfiguration.idleTextColor)
+                }
+
             } else {
                 personView.text = "NO PERSON"
                 personView.setBackgroundColor(ProjectConfiguration.idleBackgroundColor)
@@ -218,6 +245,7 @@ class CameraFragment : Fragment(), PersonClassifier.DetectorListener {
             fragmentCameraBinding.overlay.invalidate()
         }
     }
+
 
     override fun onObjectDetectionError(error: String) {
         activity?.runOnUiThread {
