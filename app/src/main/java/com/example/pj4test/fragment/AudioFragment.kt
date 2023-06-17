@@ -11,6 +11,8 @@ import androidx.fragment.app.Fragment
 import com.example.pj4test.ProjectConfiguration
 import com.example.pj4test.audioInference.SnapClassifier
 import com.example.pj4test.databinding.FragmentAudioBinding
+import java.time.LocalDateTime
+
 
 class AudioFragment: Fragment(), SnapClassifier.DetectorListener {
     private val TAG = "AudioFragment"
@@ -27,6 +29,8 @@ class AudioFragment: Fragment(), SnapClassifier.DetectorListener {
     lateinit var snapView: TextView
 
     private var listener: AudioFragmentListener? = null
+
+    private var snapdetect = false
 
     fun setAudioFragmentListener(listener: AudioFragmentListener) {
         this.listener = listener
@@ -71,16 +75,17 @@ class AudioFragment: Fragment(), SnapClassifier.DetectorListener {
                 snapView.text = "FALL SOUND"
                 snapView.setBackgroundColor(ProjectConfiguration.activeBackgroundColor)
                 snapView.setTextColor(ProjectConfiguration.activeTextColor)
+                snapdetect = true
                 this.listener?.onSnapDetected()
-                var i = 0
-                if(listener==null) {i =1}
-                Log.d("MainActivity", "here:"+i)
-                Log.d("MainActivity", "Hello World Hi")
             } else {
+                if (snapdetect){
+                    Thread.sleep(100)
+                    this.listener?.nonSnapDetected()
+                }
                 snapView.text = "NO FALL SOUND"
                 snapView.setBackgroundColor(ProjectConfiguration.idleBackgroundColor)
                 snapView.setTextColor(ProjectConfiguration.idleTextColor)
-                this.listener?.nonSnapDetected()
+                snapdetect = false
             }
         }
     }
