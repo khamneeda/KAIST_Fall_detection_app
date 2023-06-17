@@ -230,7 +230,7 @@ class CameraFragment : Fragment(), PersonClassifier.DetectorListener {
                 personView.text = "FALL HAS DETECTED"
                 personView.setBackgroundColor(ProjectConfiguration.activeBackgroundColor)
                 personView.setTextColor(ProjectConfiguration.activeTextColor)
-                setImage()
+                onDestroyView()
             } else {
 
                 // change UI according to the result
@@ -240,6 +240,7 @@ class CameraFragment : Fragment(), PersonClassifier.DetectorListener {
                         personView.setBackgroundColor(ProjectConfiguration.activeBackgroundColor)
                         personView.setTextColor(ProjectConfiguration.activeTextColor)
                         london_bridge_has_fallen = true
+                        onDestroyView()
                     } else {
                         personView.text = "NOT FALL"
                         personView.setBackgroundColor(ProjectConfiguration.idleBackgroundColor)
@@ -259,9 +260,6 @@ class CameraFragment : Fragment(), PersonClassifier.DetectorListener {
         }
     }
 
-    fun setImage(){
-        Thread.sleep(100000)
-    }
 
     override fun onObjectDetectionError(error: String) {
         activity?.runOnUiThread {

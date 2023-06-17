@@ -99,7 +99,7 @@ class SnapClassifier {
         val output = classifier.classify(tensor)
         Log.d(TAG, output.toString())
 
-        return output[0].categories.find { it.label == "Tap" }!!.score
+        return output[0].categories.find { it.label == "Clapping" }!!.score
     }
 
     fun startInferencing() {
@@ -149,7 +149,7 @@ class SnapClassifier {
     companion object {
         const val TAG = "HornClassifier"
 
-        const val REFRESH_INTERVAL_MS = 33L
+        const val REFRESH_INTERVAL_MS = 70L
         const val YAMNET_MODEL = "yamnet_classification.tflite"
 
         const val THRESHOLD = 0.3f
