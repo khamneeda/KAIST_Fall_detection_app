@@ -19,7 +19,10 @@
     android:id="@+id/camera_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
+    <FrameLayout
+        android:id="@+id/viewFinderContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
     <androidx.camera.view.PreviewView
         android:id="@+id/view_finder"
         android:layout_width="match_parent"
@@ -28,7 +31,7 @@
         app:scaleType="fillStart">
 
     </androidx.camera.view.PreviewView>
-
+    </FrameLayout>
     <com.example.pj4test.OverlayView
         android:id="@+id/overlay"
         android:layout_width="match_parent"

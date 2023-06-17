@@ -15,14 +15,19 @@
  */
 package com.example.pj4test.fragment
 
+import android.os.Handler
+import android.os.Looper
+
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.camera.core.AspectRatio
@@ -35,8 +40,10 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
+import androidx.core.os.HandlerCompat.postDelayed
 import androidx.fragment.app.Fragment
 import com.example.pj4test.ProjectConfiguration
+import com.example.pj4test.R
 import java.util.LinkedList
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -67,15 +74,45 @@ class CameraFragment : Fragment(), PersonClassifier.DetectorListener {
     private lateinit var cameraExecutor: ExecutorService
 
     var isPersonDetectionEnabled = false
+    private var blackView: View? = null
+    fun blackOutViewFinder(viewFinderContainer: ViewGroup) {
+        //Handler handler = Handler()
+        //handler.postDelayed({
+        blackView = View(viewFinderContainer.context).apply {
+            setBackgroundColor(Color.BLACK)
+            layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
+        }
+
+        viewFinderContainer.addView(blackView)
+        //}, 5000)
+    }
+    fun removeBlackView() {
+        blackView?.let { view ->
+            val parent = view.parent as? ViewGroup
+            parent?.removeView(view)
+            blackView = null
+        }
+    }
 
     fun startPersonDetection() {
+        removeBlackView()
         isPersonDetectionEnabled = true
         Log.d("MainActivity", "Person detection enabled")
+        fragmentCameraBinding.viewFinder.post {
+            // Set up the camera and its use cases
+            setUpCamera()
+        }
     }
 
     fun stopPersonDetection() {
+        Thread.sleep(1000)
         isPersonDetectionEnabled = false
         Log.d("MainActivity", "Person detection disabled")
+
+        blackOutViewFinder(fragmentCameraBinding.viewFinderContainer)
     }
 
     override fun onDestroyView() {
@@ -108,10 +145,7 @@ class CameraFragment : Fragment(), PersonClassifier.DetectorListener {
         cameraExecutor = Executors.newSingleThreadExecutor()
 
         // Wait for the views to be properly laid out
-        fragmentCameraBinding.viewFinder.post {
-            // Set up the camera and its use cases
-            setUpCamera()
-        }
+
 
         personView = fragmentCameraBinding.PersonView
     }
