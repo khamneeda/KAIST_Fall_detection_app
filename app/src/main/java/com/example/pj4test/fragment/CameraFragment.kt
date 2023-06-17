@@ -18,7 +18,9 @@ package com.example.pj4test.fragment
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.os.Bundle
+import android.os.Environment
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -43,7 +45,12 @@ import java.util.concurrent.Executors
 import com.example.pj4test.cameraInference.PersonClassifier
 import com.example.pj4test.databinding.FragmentCameraBinding
 import org.tensorflow.lite.task.vision.detector.Detection
+import java.io.File
 import java.time.LocalDateTime
+import android.media.MediaScannerConnection
+import java.io.FileOutputStream
+import java.io.IOException
+
 
 class CameraFragment : Fragment(), PersonClassifier.DetectorListener {
     private val TAG = "CameraFragment"
@@ -222,15 +229,14 @@ class CameraFragment : Fragment(), PersonClassifier.DetectorListener {
             val isPersonDetected: Boolean =
                 results!!.find { it.categories[0].label == "person" } != null
 
-            var i = 0
-            if(isPersonDetectionEnabled==true) {i =1}
-            Log.d("MainActivity", "here22:"+i)
 
             if (london_bridge_has_fallen) {
                 personView.text = "FALL HAS DETECTED"
                 personView.setBackgroundColor(ProjectConfiguration.activeBackgroundColor)
                 personView.setTextColor(ProjectConfiguration.activeTextColor)
+                captureScreenshot()
                 onDestroyView()
+
             } else {
 
                 // change UI according to the result
@@ -240,6 +246,7 @@ class CameraFragment : Fragment(), PersonClassifier.DetectorListener {
                         personView.setBackgroundColor(ProjectConfiguration.activeBackgroundColor)
                         personView.setTextColor(ProjectConfiguration.activeTextColor)
                         london_bridge_has_fallen = true
+                        captureScreenshot()
                         onDestroyView()
                     } else {
                         personView.text = "NOT FALL"
@@ -259,6 +266,52 @@ class CameraFragment : Fragment(), PersonClassifier.DetectorListener {
             }
         }
     }
+
+    private fun captureScreenshot() {
+        // Get the root view of the fragment
+        val rootView = requireActivity().window.decorView.rootView
+
+        // Create a bitmap with the same size as the rootView
+        val screenshotBitmap = Bitmap.createBitmap(rootView.width, rootView.height, Bitmap.Config.ARGB_8888)
+
+        // Create a canvas and associate it with the bitmap
+        val canvas = Canvas(screenshotBitmap)
+
+        // Draw the rootView onto the canvas
+        rootView.draw(canvas)
+
+        // Save the screenshot to the Pictures directory
+        val screenshotsDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+        val fileName = "screenshot_for_falling.png"
+        val screenshotFile = File(screenshotsDirectory, fileName)
+
+        try {
+            // Create a file output stream
+            val outputStream = FileOutputStream(screenshotFile)
+
+            // Compress the bitmap to PNG format and write it to the output stream
+            screenshotBitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+
+            // Flush and close the output stream
+            outputStream.flush()
+            outputStream.close()
+
+            // Notify the MediaScanner about the new file so it's immediately accessible
+            MediaScannerConnection.scanFile(
+                requireContext(),
+                arrayOf(screenshotFile.absolutePath),
+                null,
+                null
+            )
+
+            // Display a toast message indicating the screenshot was saved successfully
+            Toast.makeText(requireContext(), "Screenshot saved", Toast.LENGTH_SHORT).show()
+        } catch (e: IOException) {
+            e.printStackTrace()
+            Toast.makeText(requireContext(), "Failed to save screenshot", Toast.LENGTH_SHORT).show()
+        }
+    }
+
 
 
     override fun onObjectDetectionError(error: String) {
