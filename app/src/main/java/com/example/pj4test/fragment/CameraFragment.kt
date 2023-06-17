@@ -75,6 +75,7 @@ class CameraFragment : Fragment(), PersonClassifier.DetectorListener {
 
     var isPersonDetectionEnabled = false
     private var blackView: View? = null
+    var cameraon =false
     fun blackOutViewFinder(viewFinderContainer: ViewGroup) {
         //Handler handler = Handler()
         //handler.postDelayed({
@@ -98,13 +99,15 @@ class CameraFragment : Fragment(), PersonClassifier.DetectorListener {
     }
 
     fun startPersonDetection() {
-        removeBlackView()
+        //removeBlackView()
         isPersonDetectionEnabled = true
         Log.d("MainActivity", "Person detection enabled")
+        if(!cameraon)
         fragmentCameraBinding.viewFinder.post {
             // Set up the camera and its use cases
             setUpCamera()
         }
+        cameraon=true
     }
 
     fun stopPersonDetection() {
@@ -112,7 +115,7 @@ class CameraFragment : Fragment(), PersonClassifier.DetectorListener {
         isPersonDetectionEnabled = false
         Log.d("MainActivity", "Person detection disabled")
 
-        blackOutViewFinder(fragmentCameraBinding.viewFinderContainer)
+        //blackOutViewFinder(fragmentCameraBinding.viewFinderContainer)
     }
 
     override fun onDestroyView() {
