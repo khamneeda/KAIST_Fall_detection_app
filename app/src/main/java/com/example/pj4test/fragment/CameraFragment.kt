@@ -71,6 +71,11 @@ class CameraFragment : Fragment(), PersonClassifier.DetectorListener {
     fun startPersonDetection() {
         isPersonDetectionEnabled = true
         Log.d("MainActivity", "Person detection enabled")
+        // Wait for the views to be properly laid out
+        fragmentCameraBinding.viewFinder.post {
+            // Set up the camera and its use cases
+            setUpCamera()
+        }
     }
 
     fun stopPersonDetection() {
@@ -107,11 +112,6 @@ class CameraFragment : Fragment(), PersonClassifier.DetectorListener {
         // Initialize our background executor
         cameraExecutor = Executors.newSingleThreadExecutor()
 
-        // Wait for the views to be properly laid out
-        fragmentCameraBinding.viewFinder.post {
-            // Set up the camera and its use cases
-            setUpCamera()
-        }
 
         personView = fragmentCameraBinding.PersonView
     }
@@ -244,6 +244,7 @@ class CameraFragment : Fragment(), PersonClassifier.DetectorListener {
                         personView.text = "NOT FALL"
                         personView.setBackgroundColor(ProjectConfiguration.idleBackgroundColor)
                         personView.setTextColor(ProjectConfiguration.idleTextColor)
+                        stopPersonDetection()
                     }
 
                 } else {

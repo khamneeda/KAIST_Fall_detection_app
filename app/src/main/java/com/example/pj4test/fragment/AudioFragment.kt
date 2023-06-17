@@ -80,7 +80,7 @@ class AudioFragment: Fragment(), SnapClassifier.DetectorListener {
                 snapView.text = "NO FALL SOUND"
                 snapView.setBackgroundColor(ProjectConfiguration.idleBackgroundColor)
                 snapView.setTextColor(ProjectConfiguration.idleTextColor)
-                this.listener?.nonSnapDetected()
+                //this.listener?.nonSnapDetected()
             }
         }
     }
