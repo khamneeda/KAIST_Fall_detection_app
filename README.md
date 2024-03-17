@@ -1,5 +1,6 @@
 KAIST fall detection project
-Please refer to the video:)
+
+Please refer to the demo video:)
 
 Building android application which detects falling (from bed)
 1. Use sound sensor and yamnet model to detect falling sound.
